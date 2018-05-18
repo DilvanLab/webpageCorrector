@@ -22,6 +22,12 @@
  *
  */
 
+@Grapes([
+        @Grab("org.gebish:geb-core:2.1"),
+        @Grab("org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"),
+        @Grab("org.seleniumhq.selenium:selenium-support:3.6.0")
+])
+
 import geb.Browser
 import geb.navigator.Navigator
 import groovy.io.FileType
@@ -62,6 +68,12 @@ def minmax(... list){
     return [min, max]
 }
 
+/**
+ * Finds the assistant professor period beginning and ending dates.
+ *
+ * @param node
+ * @return [beginning date, ending date]
+ */
 def period(node){
     int begin = 0
     int end = 2019
@@ -100,17 +112,31 @@ def period(node){
     [begin, end]
 }
 
+/**
+ * Count number of years in lst inside the closed interval [year year+4]
+ *
+ * @param lst - List of years
+ * @param year - first year: [year year+4]
+ * @return number or years in the interval
+ */
+//
 def num(List lst, int year){
     int count = 0
     lst.each{if (it >= year && it < (year+5)) ++count}
-    //println(count)
     count
 }
 
+/**
+ * Finds the percentage of years that an assistant professor fulfills the position criteria.
+ *
+ * @param prof - map with professor data
+ * @param report - report file
+ * @return
+ */
 def analysis(Map prof, report){
     int art = 2
     int confArt = 1
-    int confConf =3
+    int confConf = 3
     println "Criterio: $art em periodicos OU $confArt em periodicos e $confConf em conferencias."
     report << "Criterio: $art em periodicos OU $confArt em periodicos e $confConf em conferencias.\n"
 
@@ -131,7 +157,8 @@ Browser.drive {
 
     def list = []
 
-    def dir = new File("/home/dilvan/Dropbox/IdeaProjects/webpageCorrector/src/main/resources")
+    //def dir = new File("/home/dilvan/Dropbox/IdeaProjects/webpageCorrector/src/main/resources")
+    def dir = new File(args[0])
     dir.eachFileRecurse (FileType.FILES) { File file ->
         if (file.name.endsWith('.html'))
            list <<  URLEncoder.encode( file.name, "UTF-8").replace('+', '%20').replace('%28', '(').replace('%29', ')')
@@ -140,7 +167,6 @@ Browser.drive {
 
     //println 'file:///home/dilvan/Dropbox/IdeaProjects/webpageCorrector/src/main/resources/'+list[0]
     //println 'file:///home/dilvan/Dropbox/IdeaProjects/webpageCorrector/src/main/resources/Curr%C3%ADculo%20do%20Sistema%20de%20Curr%C3%ADculos%20Lattes%20(Dilvan%20de%20Abreu%20Moreira).html'
-    //assert title == "Geb - Very Groovy Browser Automation"
 
     def report = new File('report.txt')
     if (report.exists())
